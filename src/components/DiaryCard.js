@@ -1,52 +1,48 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
+import { COLORS, SPACE, RADIUS, TYPO } from '../styles/tokens';
 
-// Menerima data title, date, preview, moodSource, dan borderColor
-export default function DiaryCard({ title, date, preview, moodSource, borderColor }) {
+export default function DiaryCard({ title, date, preview, moodUri, onPress, variant = 'list', borderColor }) {
   return (
-    // Menggabungkan style bawaan dengan warna border dari data
-    <View style={[styles.card, { borderColor: borderColor }]}>
-      <Image source={moodSource} style={styles.mood} />
-      <View style={styles.content}>
-        <Text style={styles.title} numberOfLines={1}>
-          {title}
-        </Text>
-        <Text style={styles.date}>{date}</Text>
-        <Text style={styles.preview} numberOfLines={3} ellipsizeMode="tail">
-          {preview}
-        </Text>
+    <Pressable
+      onPress={onPress}
+      android_ripple={{ color: '#e5e7eb' }}
+      style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
+      accessible
+      accessibilityLabel={`Entri ${title} tanggal ${date}`}
+    >
+      {/* Menerapkan border color dari data, atau warna default dari token */}
+      <View style={[styles.card, variant === 'grid' && styles.cardGrid, { borderColor: borderColor || COLORS.border }]}>
+        <Image source={typeof moodUri === 'string' ? { uri: moodUri } : moodUri} style={styles.mood} />
+        <View style={styles.content}>
+          <Text style={styles.title} numberOfLines={1}>{title}</Text>
+          <Text style={styles.date}>{date}</Text>
+          <Text style={styles.preview} numberOfLines={3} ellipsizeMode="tail">
+            {preview}
+          </Text>
+        </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    gap: 12,
-    padding: 12,
-    borderWidth: 2, // Ketebalan border agar warnanya terlihat jelas
-    borderRadius: 12,
-    marginBottom: 12,
+    gap: SPACE.m,
+    padding: SPACE.m,
+    borderWidth: 2,
+    borderRadius: RADIUS.card,
+    backgroundColor: COLORS.surface,
   },
+  cardGrid: {},
   mood: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 64, height: 64,
+    borderRadius: RADIUS.avatar,
+    backgroundColor: '#eef2ff',
   },
-  content: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  date: {
-    fontSize: 12,
-    color: '#6b7280',
-    marginBottom: 6,
-  },
-  preview: {
-    fontSize: 14,
-  },
+  content: { flex: 1 },
+  title: { fontSize: TYPO.title, fontWeight: '700', color: COLORS.text },
+  date: { fontSize: TYPO.caption, color: COLORS.muted, marginBottom: 6 },
+  preview: { fontSize: TYPO.body, color: COLORS.text },
 });
